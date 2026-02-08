@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import express from "express";
 import { prisma } from "../lib/prisma";
-import { decode } from "node:punycode";
 
 type UserType = {
     id: number;

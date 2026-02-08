@@ -5,8 +5,6 @@ import userRouter from './routes/user';
 import postRouter from './routes/post';
 import commentRouter from './routes/comment';
 
-
-
 const app = express();
 
 app.use(cors());

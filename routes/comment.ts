@@ -17,9 +17,20 @@ commentRouter.delete('/:id', auth, async (req , res)=> {
         if(!comment){
             return res.status(404).json({msg: 'Comment not found!'})
         }
-        if(comment.userId !== user.id){
-            return res.status(401).json({msg: 'You are not authorized to delete this comment!'})
+        
+        const post = await prisma.post.findUnique({
+            where: {
+                id: comment.postId
+            }
+        });
+        if(!post){
+            return res.status(404).json({msg: 'Post not found!'})
         }
+
+        if(post.authorId !== user.id || comment.userId !== user.id){
+            return res.status(401).json({msg: 'You are not authorized to delete this post!'})
+        }
+        
         await prisma.comment.delete({
             where: {
                 id: Number(id)

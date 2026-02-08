@@ -6,7 +6,8 @@ import { auth } from "../middleware/auth";
 const postRouter = Router();
 
 postRouter.get('/', async (req , res)=> {
-    const posts  = await prisma.post.findMany({
+    try{
+        const posts  = await prisma.post.findMany({
         orderBy: {
             createdAt: 'desc'
         },
@@ -23,11 +24,17 @@ postRouter.get('/', async (req , res)=> {
     });
     res.json(posts);
 
+    }catch(err){
+        console.log(err);
+        res.status(500).json({msg: 'Something went wrong'})
+    }
+
 });
 
 postRouter.get('/:id', async(req , res )=> {
-    const {id }= req.params;
-    const post = await prisma.post.findUnique({
+    try{
+        const {id }= req.params;
+        const post = await prisma.post.findUnique({
         where: {
             id : Number(id)
         },
@@ -56,6 +63,11 @@ postRouter.get('/:id', async(req , res )=> {
         return res.status(404).json({msg: 'Post not found'})
     }
     res.json(post);
+
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({msg: 'Something went wrong'})
+    }
 });
 
 postRouter.post('/',auth, async (req , res )=> {
