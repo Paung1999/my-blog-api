@@ -1,6 +1,7 @@
 import {faker} from '@faker-js/faker';
 import {prisma} from '../lib/prisma';
 import bcrypt from 'bcrypt';
+import {Role} from "../generated/prisma/enums"
 
 
 async function main() {
@@ -11,7 +12,8 @@ async function main() {
         data: {
             name: 'Alice',
             email: 'alice@gmail.com',
-            password: await bcrypt.hash('password',10)
+            password: await bcrypt.hash('password',10),
+            role: Role.ADMIN
         }
     });
     await prisma.user.create({

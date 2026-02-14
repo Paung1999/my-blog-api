@@ -8,6 +8,7 @@ type UserType = {
     email: string;
     password: string;
     bio?: string;
+    role?: 'string';
 }
 
 export async function auth(req:express.Request, res: express.Response, next:express.NextFunction) {
@@ -47,3 +48,15 @@ export async function auth(req:express.Request, res: express.Response, next:expr
     
     }
 }
+
+export const checkRole = (requiredRole: string) => {
+  return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const user = res.locals.user;
+    
+    if (!user || user.role !== requiredRole) {
+      return res.status(403).json({ msg: "Forbidden" });
+    }
+    
+    next();
+  };
+};

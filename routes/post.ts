@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import { prisma } from "../lib/prisma";
-import { auth } from "../middleware/auth";
+import { auth, checkRole } from "../middleware/auth";
 
 const postRouter = Router();
 
@@ -70,7 +70,7 @@ postRouter.get('/:id', async(req , res )=> {
     }
 });
 
-postRouter.post('/',auth, async (req , res )=> {
+postRouter.post('/',auth, checkRole('ADMIN'), async (req , res )=> {
     try{
         const user = res.locals.user;
         const title = req.body?.title;
@@ -94,6 +94,48 @@ postRouter.post('/',auth, async (req , res )=> {
         console.log(err);
         res.status(500).json({msg: 'Something went wrong'});
 
+    }
+});
+
+postRouter.put('/:id', auth, checkRole('ADDMIN'), async(req, res)=> {
+    try{
+        const user = res.locals.user;
+        const {id } = req.params;
+        const post = await prisma.post.findUnique({
+            where: {
+                id: Number(id)
+            }
+        });
+        if(!post){
+            return res.status(404).json({msg: 'Post not found'})
+        }
+        if(post.authorId !== user.id){
+            return res.status(401).json({msg: 'You are not authorized to edit this post'})
+        
+        }
+
+        const title = req.body?.title;
+        const content = req.body?.content;
+        if(!title || !content){
+            return res.status(400).json({msg: 'Title and content are required'})
+        }
+        const updatedPost = await prisma.post.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                title: title,
+                content: content
+            }
+        });
+        res.json({
+            msg: 'Post updated',
+            post: updatedPost
+        });
+
+    }catch(err){
+        console.log(err);
+        res.status(500).json({msg: 'Something went wrong'})
     }
 });
 
