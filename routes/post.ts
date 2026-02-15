@@ -7,20 +7,24 @@ const postRouter = Router();
 
 postRouter.get('/', async (req , res)=> {
     try{
+        const {authorId} = req.query;
+
+        const whereClause = authorId ? {authorId: Number(authorId)}: {};
         const posts  = await prisma.post.findMany({
-        orderBy: {
-            createdAt: 'desc'
-        },
-        take: 20,
-        include:{
-            author: {
-                select: {
-                    id: true,
-                    name: true,
-                }
+            where: whereClause,
+            orderBy: {
+                createdAt: 'desc'
             },
-            comment: true
-        }
+            take: 20,
+            include:{
+                author: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                },
+                comment: true
+            }
     });
     res.json(posts);
 

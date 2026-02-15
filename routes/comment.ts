@@ -5,6 +5,30 @@ import { auth } from "../middleware/auth";
 
 const  commentRouter = Router();
 
+commentRouter.get('/', async(req ,res)=> {
+    try{
+        const {userId} = req.query;
+        if(!userId){
+            return res.status(400).json({msg: 'User id is required!'})
+
+        }
+        const comments = await prisma.comment.findMany({
+            where: {userId: Number(userId)},
+            orderBy: {createdAt: 'desc'},
+            take: 20,
+            include: {
+                post: true
+            }
+        });
+        res.json(comments);
+
+
+    }catch(err){
+        console.log(err);
+        res.status(500).json({msg: 'Something went wrong!'})
+    }
+})
+
 commentRouter.delete('/:id', auth, async (req , res)=> {
     try{
         const {id } = req.params;
