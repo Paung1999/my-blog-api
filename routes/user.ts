@@ -80,6 +80,33 @@ userRouter.post('/login', async (req , res) => {
         }
     }
     return res.status(400).json({msg: 'Invalid credentials'});
+});
+
+userRouter.put('/profile', auth , async(req ,res) => {
+    try{
+        const { id } = res.locals.user;
+        const { bio } = req.body;
+        if(!id) {
+            return res.status(400).json({msg: 'Unable to find user'});
+        }
+        if(!bio){
+            return res.status(400).json({msg: 'Bio is required'});
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                bio: bio
+            }
+        });
+        res.json(updatedUser);
+
+    }catch(err){
+        console.log(err);
+        res.status(500).json({msg: 'Something went wrong'});
+    }
 })
 
 export default userRouter;
