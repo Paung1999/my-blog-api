@@ -22,8 +22,7 @@ postRouter.get('/', async (req , res)=> {
                         id: true,
                         name: true,
                     }
-                },
-                comment: true
+                }
             }
     });
     res.json(posts);
@@ -101,7 +100,7 @@ postRouter.post('/',auth, checkRole('ADMIN'), async (req , res )=> {
     }
 });
 
-postRouter.put('/:id', auth, checkRole('ADDMIN'), async(req, res)=> {
+postRouter.put('/:id', auth, checkRole('ADMIN'), async(req, res)=> {
     try{
         const user = res.locals.user;
         const {id } = req.params;

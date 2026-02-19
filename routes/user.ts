@@ -44,6 +44,11 @@ userRouter.post('/register', async(req , res) => {
             name: name,
             email: email,
             password: await bcrypt.hash(password,10)
+        },
+        select: {
+            id: true,
+            name: true,
+            email: true
         }
     });
     res.json(user);
@@ -65,7 +70,8 @@ userRouter.post('/login', async (req , res) => {
             id: true,
             name: true,
             email: true,
-            password: true
+            password: true,
+            role: true
         
         }
     });
@@ -73,8 +79,9 @@ userRouter.post('/login', async (req , res) => {
         if(await bcrypt.compare(password, user.password)){
             const token = jwt.sign({
                 id: user.id,
+                role: user.role
             }, process.env.JWT_SECRET as string, {
-                expiresIn: '1hr'
+                expiresIn: '15min'
             });
             return res.json({token, user});
         }
