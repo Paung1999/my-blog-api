@@ -27,6 +27,36 @@ commentRouter.get('/', async(req ,res)=> {
         console.log(err);
         res.status(500).json({msg: 'Something went wrong!'})
     }
+});
+
+commentRouter.put('/:id', auth, async (req , res)=> {
+    try{
+        const {id} = req.params;
+        const user = res.locals.user;
+        const content = req.body?.content;
+
+        if(!content) {
+            return res.status(400).json({msg: 'Content is required'})
+        }
+        const comment = await prisma.comment.findUnique({
+            where: {id: Number(id)}
+        });
+        if(!comment){
+            return res.status(404).json({msg: 'Comment not found'})
+        }
+        if(comment.userId !== user.id){
+            return res.status(403).json({msg: 'You can only edit your comment'})
+        }
+        const updated = await prisma.comment.update({
+            where: { id: Number(id) },
+            data: { content }
+        });
+        res.json(updated);
+
+    }catch(err){
+        console.log(err);
+        res.status(500).json({msg: 'Something went wrong'})
+    }
 })
 
 commentRouter.delete('/:id', auth, async (req , res)=> {
