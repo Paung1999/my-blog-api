@@ -57,7 +57,8 @@ postRouter.get('/:id', async(req , res )=> {
                         }
                     }
 
-                }
+                },
+                orderBy: {createdAt: 'desc'}
             }
 
         },
